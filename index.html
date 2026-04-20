@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meta Prep — Karthik</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0d;
+      --surface: #181818;
+      --surface2: #222;
+      --border: #2a2a2a;
+      --text: #e8e8e8;
+      --muted: #555;
+      --accent: #0866FF;
+      --accent-dim: rgba(8,102,255,0.12);
+      --accent-border: rgba(8,102,255,0.35);
+      --green: #2ea043;
+      --green-dim: rgba(46,160,67,0.15);
+      --yellow: #d4a017;
+      --red: #cf222e;
+      --red-dim: rgba(207,34,46,0.12);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'IBM Plex Mono', 'Courier New', monospace;
+      min-height: 100vh;
+      font-size: 13px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #root { max-width: 860px; margin: 0 auto; padding: 0 16px 100px; }
+
+    /* Header */
+    .app-header {
+      padding: 28px 0 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0;
+    }
+    .app-header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .app-title { font-size: 11px; font-weight: 600; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
+    .app-name { font-size: 22px; font-weight: 600; color: var(--text); }
+    .app-name span { color: var(--accent); }
+    .countdown-box { text-align: right; }
+    .countdown-days { font-size: 36px; font-weight: 600; color: var(--accent); line-height: 1; }
+    .countdown-label { font-size: 10px; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; margin-top: 2px; }
+    .screen-date { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+    /* Tab nav */
+    .tab-nav {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 28px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tab-nav::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      padding: 14px 18px 12px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 12px;
+    }
+    .card-sm { padding: 14px 16px; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #0756d6; }
+    .btn-ghost { background: transparent; color: var(--text); }
+    .btn-ghost:hover { background: var(--surface2); }
+    .btn-danger { background: var(--red-dim); border-color: var(--red); color: var(--red); }
+    .btn-danger:hover { background: var(--red); color: #fff; }
+    .btn-success { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+    .btn-success:hover { background: var(--green); color: #fff; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 100px;
+      letter-spacing: 0.05em;
+    }
+    .badge-blue { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-border); }
+    .badge-green { background: var(--green-dim); color: var(--green); border: 1px solid rgba(46,160,67,0.3); }
+    .badge-gray { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+    .badge-yellow { background: rgba(212,160,23,0.12); color: var(--yellow); border: 1px solid rgba(212,160,23,0.3); }
+
+    /* Section headers */
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    /* Progress bar */
+    .progress-bar {
+      height: 4px;
+      background: var(--surface2);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: width 0.3s;
+    }
+    .progress-fill.green { background: var(--green); }
+
+    /* Checkbox */
+    .check-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 6px 0;
+      cursor: pointer;
+    }
+    .check-row input[type="checkbox"] { display: none; }
+    .check-box {
+      width: 16px;
+      height: 16px;
+      min-width: 16px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+      transition: all 0.15s;
+    }
+    .check-box.checked { background: var(--green); border-color: var(--green); }
+    .check-box.checked::after { content: '✓'; font-size: 10px; color: #fff; font-weight: 600; }
+    .check-label { color: var(--text); flex: 1; }
+    .check-label.done { text-decoration: line-through; color: var(--muted); }
+
+    /* Day rows */
+    .day-row {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 6px;
+      overflow: hidden;
+    }
+    .day-row.is-today { border-color: var(--accent-border); background: var(--accent-dim); }
+    .day-row.is-offday { opacity: 0.5; }
+    .day-row.is-past { border-color: var(--border); }
+    .day-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .day-header:hover { background: rgba(255,255,255,0.02); }
+    .day-number { font-size: 10px; font-weight: 600; color: var(--muted); min-width: 44px; }
+    .day-date { font-size: 10px; color: var(--muted); min-width: 60px; }
+    .day-theme { flex: 1; font-weight: 500; }
+    .day-progress { font-size: 10px; color: var(--muted); }
+    .day-chevron { color: var(--muted); font-size: 10px; transition: transform 0.2s; }
+    .day-chevron.open { transform: rotate(90deg); }
+    .day-tasks { padding: 0 14px 12px; border-top: 1px solid var(--border); }
+    .day-tasks-inner { padding-top: 10px; }
+    .offday-toggle {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .offday-toggle.active { border-color: var(--yellow); color: var(--yellow); background: rgba(212,160,23,0.08); }
+
+    /* Standup */
+    .standup-q { margin-bottom: 18px; }
+    .standup-label { font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.05em; }
+    .standup-textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      padding: 10px 12px;
+      resize: vertical;
+      min-height: 72px;
+      transition: border-color 0.15s;
+    }
+    .standup-textarea:focus { outline: none; border-color: var(--accent); }
+    .standup-textarea:disabled { opacity: 0.5; cursor: not-allowed; }
+    .standup-locked {
+      background: var(--green-dim);
+      border: 1px solid rgba(46,160,67,0.3);
+      border-radius: 6px;
+      padding: 12px 16px;
+      color: var(--green);
+      font-size: 12px;
+    }
+    .standup-history-item { margin-bottom: 8px; }
+    .standup-history-date {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      padding: 8px 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .standup-history-body { padding: 0 14px 12px; border-top: 1px solid var(--border); }
+    .standup-history-q { font-size: 10px; color: var(--muted); margin-top: 10px; margin-bottom: 4px; }
+    .standup-history-a { font-size: 12px; color: var(--text); }
+
+    /* Timer */
+    .timer-display {
+      font-size: 64px;
+      font-weight: 600;
+      text-align: center;
+      letter-spacing: -2px;
+      line-height: 1;
+      padding: 24px 0 12px;
+      color: var(--text);
+    }
+    .timer-display.running { color: var(--accent); }
+    .timer-display.warning { color: var(--yellow); }
+    .timer-display.urgent { color: var(--red); }
+    .timer-controls { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; }
+
+    /* Phase bar */
+    .phases { display: flex; gap: 0; height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 12px; }
+    .phase-seg { height: 100%; transition: opacity 0.3s; }
+    .phase-seg.active { opacity: 1; }
+    .phase-seg.inactive { opacity: 0.2; }
+    .phase-seg.done { opacity: 0.6; }
+    .phase-info { text-align: center; margin-bottom: 20px; }
+    .phase-name { font-size: 14px; font-weight: 600; color: var(--text); }
+    .phase-tip { font-size: 11px; color: var(--muted); margin-top: 4px; font-style: italic; }
+    .phase-list { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .phase-item { font-size: 10px; padding: 2px 8px; border-radius: 100px; border: 1px solid var(--border); color: var(--muted); }
+    .phase-item.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); font-weight: 600; }
+    .phase-item.done { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+
+    /* Rep form */
+    .rep-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .rep-form-full { grid-column: 1 / -1; }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-label { font-size: 10px; font-weight: 600; color: var(--muted); letter-spacing: 0.1em; }
+    .form-input, .form-select, .form-textarea {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      padding: 8px 10px;
+      transition: border-color 0.15s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--accent); }
+    .form-select option { background: var(--surface); }
+    .form-textarea { resize: vertical; min-height: 60px; }
+
+    /* Rep log */
+    .rep-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 6px;
+    }
+    .rep-solved { font-size: 16px; min-width: 20px; text-align: center; }
+    .rep-body { flex: 1; }
+    .rep-problem { font-weight: 500; font-size: 13px; }
+    .rep-meta { font-size: 10px; color: var(--muted); margin-top: 2px; display: flex; gap: 12px; flex-wrap: wrap; }
+    .rep-notes { font-size: 11px; color: var(--muted); margin-top: 4px; font-style: italic; }
+    .rep-delete { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; padding: 2px 4px; }
+    .rep-delete:hover { color: var(--red); }
+
+    /* Streak grid */
+    .streak-stats { display: flex; gap: 24px; margin-bottom: 20px; }
+    .streak-stat { text-align: center; }
+    .streak-stat-num { font-size: 32px; font-weight: 600; color: var(--accent); line-height: 1; }
+    .streak-stat-label { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
+    .streak-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 16px; }
+    .streak-day-label { font-size: 9px; color: var(--muted); text-align: center; letter-spacing: 0.05em; }
+    .streak-cell {
+      aspect-ratio: 1;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      color: var(--muted);
+      cursor: default;
+    }
+    .streak-cell.done { background: var(--green); border-color: var(--green); color: #fff; }
+    .streak-cell.today { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+    .streak-cell.today:not(.done) { background: var(--accent-dim); color: var(--accent); }
+    .streak-cell.future { opacity: 0.3; }
+
+    /* Reflect */
+    .reflect-area { margin-bottom: 16px; }
+    .reflect-area-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .reflect-area-name { font-size: 12px; font-weight: 500; }
+    .reflect-area-score { font-size: 12px; font-weight: 600; color: var(--accent); }
+    .reflect-stars { display: flex; gap: 4px; }
+    .reflect-star {
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      transition: all 0.1s;
+    }
+    .reflect-star.selected { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .reflect-star:hover { border-color: var(--accent); }
+    .reflect-history-item { border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; margin-bottom: 8px; }
+    .reflect-history-date { font-size: 10px; font-weight: 600; color: var(--muted); margin-bottom: 8px; letter-spacing: 0.1em; }
+    .reflect-bars { display: flex; flex-direction: column; gap: 6px; }
+    .reflect-bar-row { display: flex; align-items: center; gap: 8px; }
+    .reflect-bar-label { font-size: 10px; color: var(--muted); min-width: 90px; }
+    .reflect-bar-track { flex: 1; height: 4px; background: var(--surface2); border-radius: 2px; }
+    .reflect-bar-fill { height: 100%; border-radius: 2px; background: var(--accent); }
+    .reflect-bar-val { font-size: 10px; color: var(--text); min-width: 16px; text-align: right; }
+
+    /* Utilities */
+    .flex { display: flex; }
+    .flex-between { display: flex; align-items: center; justify-content: space-between; }
+    .flex-center { display: flex; align-items: center; justify-content: center; }
+    .gap-8 { gap: 8px; }
+    .gap-12 { gap: 12px; }
+    .mt-4 { margin-top: 4px; }
+    .mt-8 { margin-top: 8px; }
+    .mt-12 { margin-top: 12px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-20 { margin-top: 20px; }
+    .mb-8 { margin-bottom: 8px; }
+    .mb-12 { margin-bottom: 12px; }
+    .mb-20 { margin-bottom: 20px; }
+    .text-muted { color: var(--muted); }
+    .text-accent { color: var(--accent); }
+    .text-green { color: var(--green); }
+    .text-small { font-size: 11px; }
+    .text-xs { font-size: 10px; }
+    .divider { height: 1px; background: var(--border); margin: 16px 0; }
+    .empty-state { text-align: center; color: var(--muted); padding: 32px 16px; font-size: 12px; }
+    .coderpad-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .coderpad-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+    @media (max-width: 540px) {
+      .timer-display { font-size: 48px; }
+      .rep-form { grid-template-columns: 1fr; }
+      .streak-stats { gap: 16px; }
+      .app-name { font-size: 18px; }
+      .countdown-days { font-size: 28px; }
+      .tab-btn { padding: 12px 12px 10px; font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useCallback } = React;
+
+    // ─── Constants ───────────────────────────────────────────────────────────
+    const PLAN_START = new Date('2026-04-16T00:00:00');
+    const SCREEN_DATE = new Date('2026-05-19T00:00:00');
+    const MAX_OFFDAYS = 6;
+    const TIMER_TOTAL = 20 * 60; // 1200 seconds
+
+    const PHASES = [
+      { name: 'Restate',      duration: 120, color: '#6366f1', tip: 'Read aloud. Restate the problem in your own words.' },
+      { name: 'Clarify',      duration: 120, color: '#8b5cf6', tip: 'Ask about edge cases, input size, output format.' },
+      { name: 'Brute Force',  duration: 180, color: '#ec4899', tip: 'State naive approach + Big-O. Out loud.' },
+      { name: 'Optimal',      duration: 300, color: '#f59e0b', tip: 'Think aloud. Sketch the approach before coding.' },
+      { name: 'Code',         duration: 360, color: '#0866FF', tip: 'Write clean code. Narrate every step as you type.' },
+      { name: 'Edge Cases',   duration: 60,  color: '#10b981', tip: 'Walk through: null, empty, single element, overflow.' },
+      { name: 'Ship Check',   duration: 60,  color: '#2ea043', tip: 'State time/space complexity. Would you ship this?' },
+    ];
+
+    const TOPICS = ['Arrays','Strings','LinkedList','Trees','Graphs','DP','Greedy','Heaps','Stack/Queue','Binary Search','HashMaps','Intervals','Trie','System Design','Other'];
+
+    // ─── 34-Day Plan ─────────────────────────────────────────────────────────
+    const PLAN = [
+      { day: 1,  theme: 'Arrays & Two Pointers',         tasks: ['LC1 Two Sum + LC167 Two Sum II (warm-up, 10 min each)','LC15 3Sum (20-min timer)','LC11 Container With Most Water (20-min timer)','Log all reps in Reps tab'] },
+      { day: 2,  theme: 'Sliding Window',                tasks: ['LC3 Longest Substring Without Repeating Chars','LC424 Longest Repeating Character Replacement','LC76 Minimum Window Substring (hard — budget 30 min)','Write out sliding window template from memory'] },
+      { day: 3,  theme: 'HashMaps & Sets',               tasks: ['LC49 Group Anagrams','LC347 Top K Frequent Elements','LC146 LRU Cache (design + implement)','Explain LRU design out loud — record yourself'] },
+      { day: 4,  theme: 'Strings & Sorting',             tasks: ['LC242 Valid Anagram + LC125 Valid Palindrome (warm-up)','LC5 Longest Palindromic Substring','LC271 Encode and Decode Strings','Practice explaining string solutions aloud while coding'] },
+      { day: 5,  theme: 'Binary Search',                 tasks: ['LC704 Binary Search (template review, 5 min)','LC33 Search in Rotated Sorted Array','LC153 Find Minimum in Rotated Sorted Array','LC4 Median of Two Sorted Arrays (stretch goal)'] },
+      { day: 6,  theme: 'Linked Lists',                  tasks: ['LC206 Reverse Linked List (iterative + recursive)','LC21 Merge Two Sorted Lists','LC141 Linked List Cycle + LC142 Cycle II','LC23 Merge K Sorted Lists (use heap)'] },
+      { day: 7,  theme: 'Week 1 Mock',                   tasks: ['CoderPad: 2 random medium problems, strict 20-min timer each','No hints, no looking up syntax','Narrate your thought process out loud the entire time','Debrief: what took too long? Log all reps'] },
+      { day: 8,  theme: 'Tree Fundamentals',             tasks: ['LC226 Invert Binary Tree + LC104 Max Depth (warm-up)','LC100 Same Tree + LC572 Subtree of Another Tree','LC543 Diameter of Binary Tree','Write BFS and DFS templates from memory'] },
+      { day: 9,  theme: 'Tree BFS',                      tasks: ['LC102 Binary Tree Level Order Traversal','LC199 Binary Tree Right Side View','LC103 Zigzag Level Order Traversal','LC297 Serialize and Deserialize Binary Tree'] },
+      { day: 10, theme: 'Tree DFS & Path Problems',      tasks: ['LC112 Path Sum + LC113 Path Sum II','LC236 Lowest Common Ancestor of Binary Tree','LC124 Binary Tree Maximum Path Sum (hard)','Explain LCA algorithm out loud twice'] },
+      { day: 11, theme: 'Binary Search Tree',            tasks: ['LC98 Validate Binary Search Tree','LC230 Kth Smallest Element in BST','LC450 Delete Node in a BST','LC108 Convert Sorted Array to BST'] },
+      { day: 12, theme: 'Graph BFS / DFS',               tasks: ['LC200 Number of Islands','LC133 Clone Graph','LC417 Pacific Atlantic Water Flow','LC695 Max Area of Island'] },
+      { day: 13, theme: 'Graph: Topo Sort & Union Find', tasks: ['LC207 Course Schedule + LC210 Course Schedule II','LC684 Redundant Connection (Union-Find)','LC323 Number of Connected Components','LC269 Alien Dictionary (hard — stretch)'] },
+      { day: 14, theme: 'Week 2 Mock',                   tasks: ['CoderPad: 1 tree + 1 graph problem, 20 min each','10-min sketch: Design a file system','Narrate your entire process out loud','Debrief + log all reps'] },
+      { day: 15, theme: 'Dynamic Programming 1D',        tasks: ['LC70 Climbing Stairs + LC198 House Robber (warm-up)','LC322 Coin Change','LC55 Jump Game + LC45 Jump Game II','Write recurrence relation before coding for each'] },
+      { day: 16, theme: 'Dynamic Programming 2D',        tasks: ['LC62 Unique Paths + LC63 Unique Paths II','LC1143 Longest Common Subsequence','LC72 Edit Distance','LC139 Word Break'] },
+      { day: 17, theme: 'DP: Advanced Patterns',         tasks: ['LC300 Longest Increasing Subsequence','LC416 Partition Equal Subset Sum (0/1 knapsack)','LC152 Maximum Product Subarray','Review all DP templates: LCS, LIS, knapsack, paths'] },
+      { day: 18, theme: 'Heaps & Priority Queue',        tasks: ['LC215 Kth Largest Element in Array','LC973 K Closest Points to Origin','LC295 Find Median from Data Stream','LC621 Task Scheduler'] },
+      { day: 19, theme: 'Stack & Monotonic Stack',       tasks: ['LC155 Min Stack + LC225 Implement Queue using Stacks','LC739 Daily Temperatures (monotonic stack)','LC84 Largest Rectangle in Histogram (hard)','Explain monotonic stack pattern out loud'] },
+      { day: 20, theme: 'Intervals & Greedy',            tasks: ['LC56 Merge Intervals + LC57 Insert Interval','LC435 Non-overlapping Intervals + LC252 Meeting Rooms','LC134 Gas Station','LC135 Candy (hard greedy)'] },
+      { day: 21, theme: 'Week 3 Full Mock',              tasks: ['Full 45-min simulation: 2 problems back-to-back','Simulate exact Meta conditions: CoderPad, you are candidate','Focus: never go silent, narrate every thought','Debrief: timing analysis + log both reps'] },
+      { day: 22, theme: 'System Design: Fundamentals',   tasks: ['Study: CAP theorem, consistent hashing, sharding','Design URL Shortener end-to-end (write 1-page doc)','Design Rate Limiter (token bucket vs leaky bucket)','Explain both designs aloud in 10 min each'] },
+      { day: 23, theme: 'System Design: Social Scale',   tasks: ['Design News Feed (fanout on write vs read, ranking)','Design Social Graph / Friend Recommendations','Key: graph storage, relevance, caching strategy','Draw architecture diagram on paper'] },
+      { day: 24, theme: 'System Design: Data & Storage', tasks: ['Design Distributed Cache (Redis/Memcached patterns)','Design Key-Value Store (Dynamo/Cassandra model)','Study: write-through vs write-behind, eviction policies','Explain cache invalidation strategies aloud'] },
+      { day: 25, theme: 'System Design: Messaging',      tasks: ['Design Notification System (push + email + in-app)','Design Chat/Messaging System (WhatsApp-scale)','Study: WebSockets, long polling, message queues','Design search autocomplete system'] },
+      { day: 26, theme: 'Behavioral & STAR Stories',     tasks: ['Write STAR stories: ownership, conflict, failure, innovation','Write STAR stories: impact, collaboration, ambiguity, speed','Practice 3 stories out loud (record on phone)','Prepare 5 strong questions to ask the interviewer'] },
+      { day: 27, theme: 'Hard Problems Sprint',          tasks: ['LC41 First Missing Positive (35-min timer)','LC84 or LC85 Maximal Rectangle (35-min timer)','Focus: stay calm, narrate under pressure','Log both reps — analyze time breakdown by phase'] },
+      { day: 28, theme: 'Full Mock Interview Day',       tasks: ['Schedule a friend or use Pramp / Interviewing.io','45-min coding interview simulation (real CoderPad)','30-min system design simulation','Get feedback, log everything, adjust plan'] },
+      { day: 29, theme: 'Weak Areas Revisit',            tasks: ['Review all unsolved / slow reps in rep log','Pick 3 problem types you got wrong — redo them','Re-read your notes on trickiest concepts','Light day: max 2 hours total'] },
+      { day: 30, theme: 'Speed Warm-up Day',             tasks: ['10 easy/medium problems in 3 hours (< 20 min each)','Focus: get into flow state, no overthinking','Mix of arrays, strings, trees — all green checkmarks','Log every rep — today should be all ✓ solved'] },
+      { day: 31, theme: 'System Design Review',          tasks: ['Whiteboard 3 designs from memory (paper/iPad)','URL Shortener, News Feed, Distributed Cache','Time yourself: 25 min per design','Review any gaps against your design docs'] },
+      { day: 32, theme: 'CoderPad Final Mock',           tasks: ['Real CoderPad: 2 problems, 45 min total, real conditions','No external tabs, no hints','Focus on communication more than correctness','Debrief and adjust your confidence calibration'] },
+      { day: 33, theme: 'Light Prep Day',                tasks: ['3 easy warm-up problems (max 30 min total)','Review your best 3 STAR stories aloud once','Prepare setup: CoderPad bookmark, water, quiet room','Sleep by 10pm'] },
+      { day: 34, theme: '🎯 SCREEN DAY — May 19',        tasks: ['Warm up: 1 easy problem (10 min max, then stop)','ALWAYS restate the problem before you start coding','Ask 1-2 clarifying questions (edge cases, constraints)','Narrate every thought — silence is your enemy. You\'ve got this.'] },
+    ];
+
+    // ─── Storage helpers ──────────────────────────────────────────────────────
+    const ls = {
+      get: (k, def) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch { return def; } },
+      set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+    };
+
+    // ─── Date helpers ─────────────────────────────────────────────────────────
+    function toDateStr(d) {
+      return d.toISOString().slice(0, 10);
+    }
+    function today() { return toDateStr(new Date()); }
+    function todayDayNum() {
+      const now = new Date(); now.setHours(0,0,0,0);
+      const start = new Date(PLAN_START); start.setHours(0,0,0,0);
+      return Math.floor((now - start) / 86400000) + 1;
+    }
+    function getDayDate(dayNum) {
+      const d = new Date(PLAN_START);
+      d.setDate(d.getDate() + dayNum - 1);
+      return d;
+    }
+    function fmtDate(d) {
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+    function daysUntilScreen() {
+      const now = new Date(); now.setHours(0,0,0,0);
+      const screen = new Date(SCREEN_DATE); screen.setHours(0,0,0,0);
+      return Math.max(0, Math.floor((screen - now) / 86400000));
+    }
+    function fmtTime(secs) {
+      const m = Math.floor(secs / 60);
+      const s = secs % 60;
+      return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    }
+
+    // ─── Phase helpers ────────────────────────────────────────────────────────
+    function getPhaseIndex(secondsLeft) {
+      const elapsed = TIMER_TOTAL - secondsLeft;
+      let cum = 0;
+      for (let i = 0; i < PHASES.length; i++) {
+        cum += PHASES[i].duration;
+        if (elapsed < cum) return i;
+      }
+      return PHASES.length - 1;
+    }
+
+    // ─── App ──────────────────────────────────────────────────────────────────
+    function App() {
+      const [tab, setTab] = useState('plan');
+      const tabs = [
+        { id: 'plan',    label: 'Plan' },
+        { id: 'standup', label: 'Standup' },
+        { id: 'reps',    label: 'Reps' },
+        { id: 'streak',  label: 'Streak' },
+        { id: 'reflect', label: 'Reflect' },
+      ];
+      const dl = daysUntilScreen();
+      return (
+        <div>
+          <header className="app-header">
+            <div className="app-header-top">
+              <div>
+                <div className="app-title">Meta Prep — Karthik Kottugumada</div>
+                <div className="app-name">E6 Staff Backend <span>SWE</span></div>
+              </div>
+              <div className="countdown-box">
+                <div className="countdown-days">{dl}</div>
+                <div className="countdown-label">days to screen</div>
+                <div className="screen-date">May 19, 2026</div>
+              </div>
+            </div>
+          </header>
+          <nav className="tab-nav">
+            {tabs.map(t => (
+              <button key={t.id} className={`tab-btn${tab === t.id ? ' active' : ''}`} onClick={() => setTab(t.id)}>
+                {t.label}
+              </button>
+            ))}
+          </nav>
+          {tab === 'plan'    && <PrepPlanTab />}
+          {tab === 'standup' && <StandupTab />}
+          {tab === 'reps'    && <RepsTab />}
+          {tab === 'streak'  && <StreakTab />}
+          {tab === 'reflect' && <ReflectTab />}
+        </div>
+      );
+    }
+
+    // ─── PrepPlanTab ──────────────────────────────────────────────────────────
+    function PrepPlanTab() {
+      const [completed, setCompleted] = useState(() => ls.get('meta-prep-completed', {}));
+      const [offdays, setOffdays] = useState(() => new Set(ls.get('meta-prep-offdays', [])));
+      const [expanded, setExpanded] = useState(() => {
+        const dn = todayDayNum();
+        return dn >= 1 && dn <= 34 ? new Set([dn]) : new Set([1]);
+      });
+      const dayNum = todayDayNum();
+
+      function toggleTask(day, taskIdx) {
+        const key = `${day}-${taskIdx}`;
+        const next = { ...completed, [key]: !completed[key] };
+        if (!next[key]) delete next[key];
+        setCompleted(next);
+        ls.set('meta-prep-completed', next);
+      }
+
+      function toggleOffday(day) {
+        const next = new Set(offdays);
+        if (next.has(day)) { next.delete(day); }
+        else if (next.size < MAX_OFFDAYS) { next.add(day); }
+        setOffdays(next);
+        ls.set('meta-prep-offdays', [...next]);
+      }
+
+      function toggleExpanded(day) {
+        const next = new Set(expanded);
+        if (next.has(day)) next.delete(day); else next.add(day);
+        setExpanded(next);
+      }
+
+      const totalTasks = PLAN.reduce((s, d) => s + d.tasks.length, 0);
+      const doneTasks = Object.values(completed).filter(Boolean).length;
+      const weeklyGroups = [];
+      for (let i = 0; i < PLAN.length; i += 7) weeklyGroups.push(PLAN.slice(i, i + 7));
+
+      return (
+        <div>
+          {/* Summary */}
+          <div className="card mb-12">
+            <div className="flex-between mb-8">
+              <div>
+                <div className="text-xs text-muted">Overall progress</div>
+                <div style={{fontSize:18,fontWeight:600,marginTop:2}}>{doneTasks} / {totalTasks} tasks</div>
+              </div>
+              <div style={{textAlign:'right'}}>
+                <div className="text-xs text-muted">Off days used</div>
+                <div style={{fontSize:18,fontWeight:600,marginTop:2}}>{offdays.size} / {MAX_OFFDAYS}</div>
+              </div>
+            </div>
+            <div className="progress-bar">
+              <div className="progress-fill" style={{width:`${Math.round(doneTasks/totalTasks*100)}%`}}></div>
+            </div>
+            <div className="text-xs text-muted mt-4">{Math.round(doneTasks/totalTasks*100)}% complete</div>
+          </div>
+
+          {/* Day list by week */}
+          {weeklyGroups.map((week, wi) => {
+            const weekDone = week.reduce((s,d) => s + d.tasks.filter((_,ti) => completed[`${d.day}-${ti}`]).length, 0);
+            const weekTotal = week.reduce((s,d) => s + d.tasks.length, 0);
+            return (
+              <div key={wi} className="mb-20">
+                <div className="flex-between mb-8">
+                  <div className="section-label">Week {wi+1}</div>
+                  <div className="text-xs text-muted">{weekDone}/{weekTotal}</div>
+                </div>
+                {week.map(d => {
+                  const date = getDayDate(d.day);
+                  const isToday = d.day === dayNum;
+                  const isPast = d.day < dayNum;
+                  const isOff = offdays.has(d.day);
+                  const isOpen = expanded.has(d.day);
+                  const tasksDone = d.tasks.filter((_,ti) => completed[`${d.day}-${ti}`]).length;
+                  const allDone = tasksDone === d.tasks.length;
+                  return (
+                    <div key={d.day} className={`day-row${isToday?' is-today':''}${isOff?' is-offday':''}${isPast&&!isToday?' is-past':''}`}>
+                      <div className="day-header" onClick={() => toggleExpanded(d.day)}>
+                        <span className="day-number">Day {d.day}</span>
+                        <span className="day-date">{fmtDate(date)}</span>
+                        <span className="day-theme">
+                          {d.theme}
+                          {isToday && <span className="badge badge-blue" style={{marginLeft:8}}>TODAY</span>}
+                          {allDone && !isOff && <span className="badge badge-green" style={{marginLeft:8}}>✓</span>}
+                          {isOff && <span className="badge badge-yellow" style={{marginLeft:8}}>OFF</span>}
+                        </span>
+                        <span className="day-progress">{tasksDone}/{d.tasks.length}</span>
+                        <span className={`day-chevron${isOpen?' open':''}`}>▶</span>
+                      </div>
+                      {isOpen && (
+                        <div className="day-tasks">
+                          <div className="day-tasks-inner">
+                            {d.tasks.map((task, ti) => {
+                              const done = !!completed[`${d.day}-${ti}`];
+                              return (
+                                <label key={ti} className="check-row">
+                                  <div className={`check-box${done?' checked':''}`}></div>
+                                  <span className={`check-label${done?' done':''}`}>{task}</span>
+                                  <input type="checkbox" checked={done} onChange={() => toggleTask(d.day, ti)} />
+                                </label>
+                              );
+                            })}
+                            <div className="flex-between mt-12">
+                              <button
+                                className={`offday-toggle${isOff?' active':''}`}
+                                onClick={e => { e.stopPropagation(); toggleOffday(d.day); }}
+                                disabled={!isOff && offdays.size >= MAX_OFFDAYS}
+                              >
+                                {isOff ? '↩ Restore day' : `Mark off-day (${MAX_OFFDAYS - offdays.size} left)`}
+                              </button>
+                              <span className="text-xs text-muted">{tasksDone}/{d.tasks.length} done</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    // ─── StandupTab ───────────────────────────────────────────────────────────
+    const STANDUP_QS = [
+      'What did you practice yesterday?',
+      'What is your focus for today?',
+      'Any blockers, anxiety, or bad patterns to call out?',
+    ];
+
+    function StandupTab() {
+      const todayStr = today();
+      const [answers, setAnswers] = useState(['','','']);
+      const [submitted, setSubmitted] = useState(() => {
+        const s = ls.get(`standup-${todayStr}`, null);
+        return s ? s.answers : null;
+      });
+      const [history, setHistory] = useState(() => {
+        const keys = [];
+        for (let i = 1; i <= 30; i++) {
+          const d = new Date(); d.setDate(d.getDate() - i);
+          const k = toDateStr(d);
+          const s = ls.get(`standup-${k}`, null);
+          if (s) keys.push({ date: k, data: s });
+        }
+        return keys;
+      });
+      const [histOpen, setHistOpen] = useState(new Set());
+
+      function submit() {
+        if (answers.every(a => a.trim())) {
+          const data = { answers, submittedAt: new Date().toISOString() };
+          ls.set(`standup-${todayStr}`, data);
+          setSubmitted(answers);
+          setHistory(prev => [{ date: todayStr, data }, ...prev]);
+        }
+      }
+
+      const fmtHistDate = (s) => new Date(s).toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+
+      return (
+        <div>
+          <div className="card mb-20">
+            <div className="flex-between mb-12">
+              <div>
+                <div className="section-label">Daily Standup</div>
+                <div style={{fontSize:14,fontWeight:500}}>{new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}</div>
+              </div>
+              {submitted && <span className="badge badge-green">Submitted</span>}
+            </div>
+
+            {submitted ? (
+              <div>
+                <div className="standup-locked mb-12">✓ Today's standup submitted. See you tomorrow.</div>
+                {STANDUP_QS.map((q, i) => (
+                  <div key={i} className="standup-q">
+                    <div className="standup-label">{q}</div>
+                    <div style={{fontSize:12,color:'var(--text)',paddingLeft:4}}>{submitted[i] || '—'}</div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div>
+                {STANDUP_QS.map((q, i) => (
+                  <div key={i} className="standup-q">
+                    <div className="standup-label">{i+1}. {q}</div>
+                    <textarea
+                      className="standup-textarea"
+                      placeholder="Write something…"
+                      value={answers[i]}
+                      onChange={e => { const n=[...answers]; n[i]=e.target.value; setAnswers(n); }}
+                    />
+                  </div>
+                ))}
+                <button
+                  className="btn btn-primary"
+                  onClick={submit}
+                  disabled={!answers.every(a => a.trim())}
+                >
+                  Submit standup
+                </button>
+              </div>
+            )}
+          </div>
+
+          {history.length > 0 && (
+            <div>
+              <div className="section-label">Past standups</div>
+              {history.map(({ date, data }) => {
+                const isOpen = histOpen.has(date);
+                return (
+                  <div key={date} className="day-row mb-8">
+                    <div className="standup-history-date" onClick={() => {
+                      const n = new Set(histOpen);
+                      if (n.has(date)) n.delete(date); else n.add(date);
+                      setHistOpen(n);
+                    }}>
+                      <span>{fmtHistDate(date)}</span>
+                      <span>{isOpen ? '▲' : '▼'}</span>
+                    </div>
+                    {isOpen && (
+                      <div className="standup-history-body">
+                        {STANDUP_QS.map((q, i) => (
+                          <div key={i}>
+                            <div className="standup-history-q">{q}</div>
+                            <div className="standup-history-a">{data.answers[i] || '—'}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ─── RepsTab ──────────────────────────────────────────────────────────────
+    function RepsTab() {
+      const [secondsLeft, setSecondsLeft] = useState(TIMER_TOTAL);
+      const [running, setRunning] = useState(false);
+      const intervalRef = useRef(null);
+      const [reps, setReps] = useState(() => ls.get('reps', []));
+      const [form, setForm] = useState({ problem:'', time:'', solved:'yes', topic:'Arrays', notes:'' });
+      const [addOpen, setAddOpen] = useState(false);
+
+      useEffect(() => {
+        if (running) {
+          intervalRef.current = setInterval(() => {
+            setSecondsLeft(s => {
+              if (s <= 1) { clearInterval(intervalRef.current); setRunning(false); return 0; }
+              return s - 1;
+            });
+          }, 1000);
+        }
+        return () => clearInterval(intervalRef.current);
+      }, [running]);
+
+      function startStop() {
+        if (secondsLeft === 0) return;
+        setRunning(r => !r);
+      }
+      function reset() { setRunning(false); clearInterval(intervalRef.current); setSecondsLeft(TIMER_TOTAL); }
+
+      const phaseIdx = getPhaseIndex(secondsLeft);
+      const phase = PHASES[phaseIdx];
+      const elapsed = TIMER_TOTAL - secondsLeft;
+
+      let timerClass = 'timer-display';
+      if (running) {
+        if (secondsLeft < 120) timerClass += ' urgent';
+        else if (secondsLeft < 300) timerClass += ' warning';
+        else timerClass += ' running';
+      }
+
+      function addRep(e) {
+        e.preventDefault();
+        if (!form.problem.trim()) return;
+        const rep = { id: Date.now(), ...form, date: today() };
+        const next = [rep, ...reps];
+        setReps(next);
+        ls.set('reps', next);
+        setForm({ problem:'', time:'', solved:'yes', topic:'Arrays', notes:'' });
+        setAddOpen(false);
+      }
+
+      function deleteRep(id) {
+        const next = reps.filter(r => r.id !== id);
+        setReps(next);
+        ls.set('reps', next);
+      }
+
+      // Phase segments
+      let phaseCum = 0;
+      const phaseSegs = PHASES.map((p, i) => {
+        const start = phaseCum;
+        phaseCum += p.duration;
+        const status = i < phaseIdx ? 'done' : i === phaseIdx ? 'active' : 'inactive';
+        return { ...p, start, status, width: (p.duration / TIMER_TOTAL * 100) + '%' };
+      });
+
+      const solvedCount = reps.filter(r => r.solved === 'yes').length;
+      const avgTime = reps.filter(r => r.time).length
+        ? Math.round(reps.filter(r=>r.time).reduce((s,r)=>s+Number(r.time),0)/reps.filter(r=>r.time).length)
+        : null;
+
+      return (
+        <div>
+          {/* Timer */}
+          <div className="card mb-12">
+            <div className="flex-between mb-8">
+              <div className="section-label">20-Minute Rep Timer</div>
+              <a href="https://coderpad.io/sandbox" target="_blank" rel="noopener" className="coderpad-btn">
+                ↗ CoderPad
+              </a>
+            </div>
+
+            {/* Phase bar */}
+            <div className="phases">
+              {phaseSegs.map((seg, i) => (
+                <div key={i} className={`phase-seg ${seg.status}`}
+                  style={{width:seg.width, background:seg.color}} />
+              ))}
+            </div>
+
+            {/* Phase labels */}
+            <div className="phase-list">
+              {PHASES.map((p, i) => {
+                const s = i < phaseIdx ? 'done' : i === phaseIdx ? 'active' : '';
+                return <span key={i} className={`phase-item${s?' '+s:''}`}>{p.name}</span>;
+              })}
+            </div>
+
+            <div className={timerClass}>{fmtTime(secondsLeft)}</div>
+
+            {running && (
+              <div className="phase-info">
+                <div className="phase-name" style={{color: phase.color}}>{phase.name}</div>
+                <div className="phase-tip">{phase.tip}</div>
+              </div>
+            )}
+
+            <div className="timer-controls">
+              <button className="btn btn-primary" onClick={startStop} disabled={secondsLeft === 0}>
+                {running ? '⏸ Pause' : secondsLeft === TIMER_TOTAL ? '▶ Start' : '▶ Resume'}
+              </button>
+              <button className="btn btn-ghost" onClick={reset}>↺ Reset</button>
+            </div>
+          </div>
+
+          {/* Rep stats */}
+          {reps.length > 0 && (
+            <div className="card card-sm mb-12">
+              <div style={{display:'flex',gap:24}}>
+                <div><div className="text-xs text-muted">Total reps</div><div style={{fontSize:20,fontWeight:600,marginTop:2}}>{reps.length}</div></div>
+                <div><div className="text-xs text-muted">Solved</div><div style={{fontSize:20,fontWeight:600,marginTop:2,color:'var(--green)'}}>{solvedCount}</div></div>
+                <div><div className="text-xs text-muted">Avg time</div><div style={{fontSize:20,fontWeight:600,marginTop:2}}>{avgTime ? `${avgTime}m` : '—'}</div></div>
+                <div><div className="text-xs text-muted">Success rate</div><div style={{fontSize:20,fontWeight:600,marginTop:2}}>{reps.length ? Math.round(solvedCount/reps.length*100)+'%' : '—'}</div></div>
+              </div>
+            </div>
+          )}
+
+          {/* Log a rep */}
+          <div className="card mb-12">
+            <div className="flex-between mb-12">
+              <div className="section-label">Log a Rep</div>
+              <button className="btn btn-ghost" style={{fontSize:11,padding:'4px 10px'}} onClick={() => setAddOpen(o => !o)}>
+                {addOpen ? '✕ Cancel' : '+ Add rep'}
+              </button>
+            </div>
+            {addOpen && (
+              <form onSubmit={addRep}>
+                <div className="rep-form">
+                  <div className="form-group rep-form-full">
+                    <label className="form-label">Problem name / LC number</label>
+                    <input className="form-input" placeholder="e.g. LC15 3Sum" value={form.problem}
+                      onChange={e => setForm(f=>({...f,problem:e.target.value}))} required />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Time taken (min)</label>
+                    <input className="form-input" type="number" min="1" max="90" placeholder="e.g. 18" value={form.time}
+                      onChange={e => setForm(f=>({...f,time:e.target.value}))} />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Solved?</label>
+                    <select className="form-select" value={form.solved} onChange={e => setForm(f=>({...f,solved:e.target.value}))}>
+                      <option value="yes">✓ Yes</option>
+                      <option value="partial">~ Partial</option>
+                      <option value="no">✗ No</option>
+                    </select>
+                  </div>
+                  <div className="form-group rep-form-full">
+                    <label className="form-label">Topic</label>
+                    <select className="form-select" value={form.topic} onChange={e => setForm(f=>({...f,topic:e.target.value}))}>
+                      {TOPICS.map(t => <option key={t}>{t}</option>)}
+                    </select>
+                  </div>
+                  <div className="form-group rep-form-full">
+                    <label className="form-label">Notes (what tripped you up?)</label>
+                    <textarea className="form-textarea" placeholder="e.g. Forgot to handle empty array edge case..."
+                      value={form.notes} onChange={e => setForm(f=>({...f,notes:e.target.value}))} />
+                  </div>
+                </div>
+                <button type="submit" className="btn btn-primary mt-8">Save rep</button>
+              </form>
+            )}
+            {!addOpen && <div className="text-xs text-muted">Track each timed practice problem here.</div>}
+          </div>
+
+          {/* Rep history */}
+          {reps.length === 0 ? (
+            <div className="empty-state">No reps logged yet.<br/>Start the timer, solve a problem, then log it.</div>
+          ) : (
+            <div>
+              <div className="section-label">Rep history ({reps.length})</div>
+              {reps.map(rep => (
+                <div key={rep.id} className="rep-item">
+                  <div className="rep-solved">
+                    {rep.solved === 'yes' ? '✅' : rep.solved === 'partial' ? '🟡' : '❌'}
+                  </div>
+                  <div className="rep-body">
+                    <div className="rep-problem">{rep.problem}</div>
+                    <div className="rep-meta">
+                      {rep.time && <span>⏱ {rep.time} min</span>}
+                      <span className="badge badge-gray">{rep.topic}</span>
+                      <span>{rep.date}</span>
+                    </div>
+                    {rep.notes && <div className="rep-notes">"{rep.notes}"</div>}
+                  </div>
+                  <button className="rep-delete" onClick={() => deleteRep(rep.id)} title="Delete">✕</button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ─── StreakTab ────────────────────────────────────────────────────────────
+    function StreakTab() {
+      const [log, setLog] = useState(() => new Set(ls.get('streak-log', [])));
+      const todayStr = today();
+      const hasDoneToday = log.has(todayStr);
+
+      function markToday() {
+        const next = new Set(log);
+        if (next.has(todayStr)) next.delete(todayStr);
+        else next.add(todayStr);
+        setLog(next);
+        ls.set('streak-log', [...next]);
+      }
+
+      // Compute current streak
+      function computeStreak(logSet) {
+        let streak = 0;
+        const d = new Date(); d.setHours(0,0,0,0);
+        // If today not done, start checking from yesterday
+        if (!logSet.has(toDateStr(d))) d.setDate(d.getDate()-1);
+        while (logSet.has(toDateStr(d))) {
+          streak++;
+          d.setDate(d.getDate()-1);
+        }
+        return streak;
+      }
+
+      function computeLongest(logSet) {
+        if (logSet.size === 0) return 0;
+        const sorted = [...logSet].sort();
+        let max = 1, cur = 1;
+        for (let i = 1; i < sorted.length; i++) {
+          const prev = new Date(sorted[i-1]); prev.setDate(prev.getDate()+1);
+          if (toDateStr(prev) === sorted[i]) { cur++; max = Math.max(max, cur); }
+          else cur = 1;
+        }
+        return max;
+      }
+
+      const currentStreak = computeStreak(log);
+      const longestStreak = computeLongest(log);
+
+      // Build 28-day grid (4 rows of 7, starting from 27 days ago)
+      const days = [];
+      const start = new Date(); start.setDate(start.getDate() - 27); start.setHours(0,0,0,0);
+      for (let i = 0; i < 28; i++) {
+        const d = new Date(start); d.setDate(start.getDate() + i);
+        const ds = toDateStr(d);
+        const isToday = ds === todayStr;
+        const isFuture = d > new Date();
+        days.push({ date: ds, day: d.getDate(), done: log.has(ds), isToday, isFuture });
+      }
+
+      const DAY_LABELS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const startDow = start.getDay();
+
+      return (
+        <div>
+          {/* Stats */}
+          <div className="card mb-20">
+            <div className="streak-stats">
+              <div className="streak-stat">
+                <div className="streak-stat-num">{currentStreak}</div>
+                <div className="streak-stat-label">Current streak</div>
+              </div>
+              <div className="streak-stat">
+                <div className="streak-stat-num" style={{color:'var(--green)'}}>{longestStreak}</div>
+                <div className="streak-stat-label">Longest streak</div>
+              </div>
+              <div className="streak-stat">
+                <div className="streak-stat-num" style={{color:'var(--text)'}}>{log.size}</div>
+                <div className="streak-stat-label">Total days done</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Mark today */}
+          <div className="card mb-20">
+            <div className="section-label">Today — {new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}</div>
+            <button
+              className={`btn ${hasDoneToday ? 'btn-success' : 'btn-primary'}`}
+              onClick={markToday}
+            >
+              {hasDoneToday ? '✓ Done — mark as not done' : '🔥 Mark today as done'}
+            </button>
+          </div>
+
+          {/* 28-day grid */}
+          <div className="card">
+            <div className="section-label mb-12">Last 28 days</div>
+            <div className="streak-grid">
+              {DAY_LABELS.map(l => <div key={l} className="streak-day-label">{l}</div>)}
+              {/* Offset for first day of week */}
+              {Array.from({length: startDow}).map((_,i) => <div key={'pad'+i} />)}
+              {days.map(d => (
+                <div key={d.date}
+                  className={`streak-cell${d.done?' done':''}${d.isToday?' today':''}${d.isFuture?' future':''}`}
+                  title={d.date}
+                >
+                  {d.day}
+                </div>
+              ))}
+            </div>
+            <div style={{display:'flex',gap:16,marginTop:12}}>
+              <div style={{display:'flex',alignItems:'center',gap:6}}>
+                <div style={{width:12,height:12,background:'var(--green)',borderRadius:2}}></div>
+                <span className="text-xs text-muted">Done</span>
+              </div>
+              <div style={{display:'flex',alignItems:'center',gap:6}}>
+                <div style={{width:12,height:12,background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:2}}></div>
+                <span className="text-xs text-muted">Missed</span>
+              </div>
+              <div style={{display:'flex',alignItems:'center',gap:6}}>
+                <div style={{width:12,height:12,background:'var(--accent-dim)',border:'1px solid var(--accent)',borderRadius:2}}></div>
+                <span className="text-xs text-muted">Today</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ─── ReflectTab ───────────────────────────────────────────────────────────
+    const REFLECT_AREAS = [
+      { key: 'speed',    label: 'Coding Speed',        desc: 'Did you finish within time?' },
+      { key: 'design',   label: 'System Design',       desc: 'Clear structure, trade-offs?' },
+      { key: 'narrate',  label: 'Think Aloud',         desc: 'Did you narrate while coding?' },
+      { key: 'energy',   label: 'Energy & Focus',      desc: 'Were you locked in?' },
+      { key: 'confidence', label: 'Confidence',        desc: 'Did you feel in control?' },
+    ];
+
+    function ReflectTab() {
+      const todayStr = today();
+      const [scores, setScores] = useState({ speed:0, design:0, narrate:0, energy:0, confidence:0 });
+      const [notes, setNotes] = useState('');
+      const [submitted, setSubmitted] = useState(() => ls.get(`reflect-${todayStr}`, null));
+      const [history, setHistory] = useState(() => {
+        const h = [];
+        for (let i = 1; i <= 60; i++) {
+          const d = new Date(); d.setDate(d.getDate()-i);
+          const k = `reflect-${toDateStr(d)}`;
+          const v = ls.get(k, null);
+          if (v) h.push({ date: toDateStr(d), data: v });
+        }
+        return h;
+      });
+
+      function submit() {
+        const data = { scores, notes, submittedAt: new Date().toISOString() };
+        ls.set(`reflect-${todayStr}`, data);
+        setSubmitted(data);
+        setHistory(prev => [{ date: todayStr, data }, ...prev]);
+      }
+
+      const allScored = Object.values(scores).every(v => v > 0);
+
+      function StarRow({ area }) {
+        return (
+          <div className="reflect-area">
+            <div className="reflect-area-header">
+              <div>
+                <div className="reflect-area-name">{area.label}</div>
+                <div className="text-xs text-muted">{area.desc}</div>
+              </div>
+              <div className="reflect-area-score">{scores[area.key] || '—'} / 5</div>
+            </div>
+            <div className="reflect-stars">
+              {[1,2,3,4,5].map(n => (
+                <button key={n} type="button"
+                  className={`reflect-star${scores[area.key] >= n?' selected':''}`}
+                  onClick={() => setScores(s => ({...s,[area.key]:n}))}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div>
+          <div className="card mb-20">
+            <div className="flex-between mb-16">
+              <div>
+                <div className="section-label">Weekly Reflection</div>
+                <div style={{fontSize:14,fontWeight:500}}>{new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}</div>
+              </div>
+              {submitted && <span className="badge badge-green">Submitted</span>}
+            </div>
+
+            {submitted ? (
+              <div>
+                <div className="standup-locked mb-16">✓ Reflection logged for today.</div>
+                <div className="reflect-bars">
+                  {REFLECT_AREAS.map(a => (
+                    <div key={a.key} className="reflect-bar-row">
+                      <div className="reflect-bar-label">{a.label}</div>
+                      <div className="reflect-bar-track">
+                        <div className="reflect-bar-fill" style={{width:`${submitted.scores[a.key]/5*100}%`}}></div>
+                      </div>
+                      <div className="reflect-bar-val">{submitted.scores[a.key]}</div>
+                    </div>
+                  ))}
+                </div>
+                {submitted.notes && (
+                  <div className="mt-12">
+                    <div className="text-xs text-muted mb-4">Notes</div>
+                    <div style={{fontSize:12}}>{submitted.notes}</div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div>
+                {REFLECT_AREAS.map(a => <StarRow key={a.key} area={a} />)}
+                <div className="divider" />
+                <div className="standup-q">
+                  <div className="standup-label">Anything to call out? Wins, struggles, adjustments?</div>
+                  <textarea className="standup-textarea" placeholder="Optional notes…"
+                    value={notes} onChange={e => setNotes(e.target.value)} />
+                </div>
+                <button className="btn btn-primary" onClick={submit} disabled={!allScored}>
+                  Save reflection
+                </button>
+                {!allScored && <div className="text-xs text-muted mt-8">Rate all 5 areas to save.</div>}
+              </div>
+            )}
+          </div>
+
+          {history.length > 0 && (
+            <div>
+              <div className="section-label">History</div>
+              {history.map(({ date, data }) => {
+                const avg = (Object.values(data.scores).reduce((s,v)=>s+v,0)/5).toFixed(1);
+                return (
+                  <div key={date} className="reflect-history-item">
+                    <div className="flex-between mb-8">
+                      <div className="reflect-history-date">
+                        {new Date(date).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}
+                      </div>
+                      <div style={{fontSize:13,fontWeight:600,color:'var(--accent)'}}>{avg} avg</div>
+                    </div>
+                    <div className="reflect-bars">
+                      {REFLECT_AREAS.map(a => (
+                        <div key={a.key} className="reflect-bar-row">
+                          <div className="reflect-bar-label">{a.label}</div>
+                          <div className="reflect-bar-track">
+                            <div className="reflect-bar-fill" style={{width:`${data.scores[a.key]/5*100}%`}}></div>
+                          </div>
+                          <div className="reflect-bar-val">{data.scores[a.key]}</div>
+                        </div>
+                      ))}
+                    </div>
+                    {data.notes && <div className="rep-notes mt-8">"{data.notes}"</div>}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ─── Mount ────────────────────────────────────────────────────────────────
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
